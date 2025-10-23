@@ -12,7 +12,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>MediCare Hospital Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="dashboard.css">
+  <link rel="stylesheet" href="../mycss/dashboard.css">
 </head>
 <body>
 
@@ -25,7 +25,7 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name">ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
@@ -42,16 +42,7 @@
       <a href="bill.jsp" class="nav-item">Billing</a>
     </nav>
     
-    <div class="appointments-sidebar">
-      <h3>Today's Appointments</h3>
-      <div class="appointment">
-        <img src="https://i.pravatar.cc/40?img=1" alt="Patient">
-        <div>
-          <div class="patient-name">John Doe</div>
-          <div class="time">10:00 AM - General Checkup</div>
-        </div>
-      </div>
-    </div>
+    
     
     <div class="sidebar-footer">
       © 2025 MediCare HMS
@@ -60,19 +51,20 @@
 
   <!-- Main Content -->
   <main class="main-content">
-    <div class="header-gradient">
-      <div class="header-content">
-        <div>
-          <h1>Dashboard</h1>
-          <p>Welcome back! Here's what's happening today.</p>
-        </div>
-        <div class="user-profile">
+      <div class="user-profile">
           <div class="user-info">
             <div class="user-name">Admin User</div>
             <div class="user-email">admin@medicare.com</div>
           </div>
           <div class="user-avatar">A</div>
         </div>
+    <div class="header-gradient">
+      <div class="header-content">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Welcome back! Here's what's happening today.</p>
+        </div>
+        
       </div>
     </div>
 
@@ -131,6 +123,16 @@
           </div>
         </div>
       </div>
+      <div class="appointments-sidebar">
+      <h3>Today's Appointments</h3>
+      <div class="appointment">
+        <img src="https://i.pravatar.cc/40?img=1" alt="Patient">
+        <div>
+          <div class="patient-name">John Doe</div>
+          <div class="time">10:00 AM - General Checkup</div>
+        </div>
+      </div>
+    </div>
     </div>
   </main>
 </div>
