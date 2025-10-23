@@ -32,14 +32,14 @@
     </div>
     
     <nav class="nav-menu">
-      <a href="#" class="nav-item active">Dashboard</a>
-      <a href="#" class="nav-item">Patients</a>
-      <a href="#" class="nav-item">Doctors</a>
-      <a href="#" class="nav-item">Departments</a>
-      <a href="#" class="nav-item">Appointments</a>
-      <a href="#" class="nav-item">Rooms</a>
-      <a href="#" class="nav-item">Staff</a>
-      <a href="#" class="nav-item">Billing</a>
+      <a href="dashboard.jsp" class="nav-item active">Dashboard</a>
+      <a href="patient.jsp" class="nav-item">Patients</a>
+      <a href="doctor.jsp" class="nav-item">Doctors</a>
+      <a href="department" class="nav-item">Departments</a>
+      <a href="appointment" class="nav-item">Appointments</a>
+      <a href="room.jsp" class="nav-item">Rooms</a>
+      <a href="staff.jsp" class="nav-item">Staff</a>
+      <a href="bill.jsp" class="nav-item">Billing</a>
     </nav>
     
     <div class="appointments-sidebar">
