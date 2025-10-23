@@ -31,16 +31,17 @@
       </div>
     </div>
     
-    <nav class="nav-menu">
-      <a href="dashboard.html" class="nav-item">Dashboard</a>
-      <a href="patients.html" class="nav-item active">Patients</a>
-      <a href="#" class="nav-item">Doctors</a>
-      <a href="#" class="nav-item">Departments</a>
-      <a href="#" class="nav-item">Appointments</a>
-      <a href="#" class="nav-item">Rooms</a>
-      <a href="#" class="nav-item">Staff</a>
-      <a href="#" class="nav-item">Billing</a>
+ <nav class="nav-menu">
+      <a href="dashboard.jsp" class="nav-item">Dashboard</a>
+      <a href="patient.jsp" class="nav-item active">Patients</a>
+      <a href="doctor.jsp" class="nav-item">Doctors</a>
+      <a href="department.jsp" class="nav-item">Departments</a>
+      <a href="appointment.jsp" class="nav-item">Appointments</a>
+      <a href="room.jsp" class="nav-item">Rooms</a>
+      <a href="staff.jsp" class="nav-item">Staff</a>
+      <a href="bill.jsp" class="nav-item">Billing</a>
     </nav>
+
     
     <div class="sidebar-footer">
       © 2025 MediCare HMS
