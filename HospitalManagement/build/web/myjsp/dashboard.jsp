@@ -1,9 +1,3 @@
-<%-- 
-    Document   : dashboard
-    Created on : 18-Oct-2025, 11:18:05 pm
-    Author     : LENOVO
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
