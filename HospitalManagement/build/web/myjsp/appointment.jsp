@@ -1,11 +1,7 @@
-<%-- 
-    Document   : appointment
-    Created on : 22-Oct-2025, 7:48:32 pm
-    Author     : LENOVO
---%>
 
+<%@ page import = "java.sql.*, javax.sql.*"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<!DOCTYPE html>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,13 +22,13 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name"ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
     </div>
     
-   <nav class="nav-menu">
+    <nav class="nav-menu">
       <a href="dashboard.jsp" class="nav-item">Dashboard</a>
       <a href="patient.jsp" class="nav-item">Patients</a>
       <a href="doctor.jsp" class="nav-item">Doctors</a>
@@ -55,26 +51,51 @@
       <button class="btn-primary" onclick="openBookAppointmentModal()">+ Book New Appointment</button>
     </div>
 
+      <%
+          int todayAppointments =0;
+          int pendingAppointments = 0;
+          int completedToday = 0;
+         Connection con = null;
+         PreparedStatement ps1 = null;
+         try{
+       Class.forName("com.mysql.cj.jdbc.Driver");
+       con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management","root","6755"); 
+          ps1 = con.prepareStatement("SELECT COUNT(*) FROM appointments WHERE DATE(appointment_date) = CURDATE() AND status='scheduled'");
+          ResultSet rs1 = ps1.executeQuery();
+          
+          if(rs1.next()) todayAppointments=rs1.getInt(1);
+          
+          PreparedStatement ps2 =  con.prepareStatement("SELECT COUNT(*) FROM appointments WHERE status ='scheduled'");
+          
+          ResultSet rs2 = ps2.executeQuery();
+          if(rs2.next()) pendingAppointments = rs2.getInt(1);
+          
+          PreparedStatement ps3 = con.prepareStatement("SELECT COUNT(*) FROM appointments WHERE status = 'completed' AND DATE(appointment_date) = CURDATE()");
+          ResultSet rs3 = ps3.executeQuery();
+          
+          if(rs3.next()) completedToday = rs3.getInt(1);
+          }catch(Exception e){ }
+      %>
     <!-- Stats Cards -->
     <div class="appointment-stats">
       <div class="stat-card">
         <div class="stat-info">
           <h3>Today's Appointments</h3>
-          <div class="stat-value">28</div>
+          <div class="stat-value"><%= todayAppointments%></div>
           <div class="stat-detail">Scheduled for today</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-info">
           <h3>Pending Appointments</h3>
-          <div class="stat-value">12</div>
+          <div class="stat-value"><%= pendingAppointments%></div>
           <div class="stat-detail">Awaiting confirmation</div>
         </div>
       </div>
       <div class="stat-card">
         <div class="stat-info">
           <h3>Completed Today</h3>
-          <div class="stat-value">16</div>
+          <div class="stat-value"><%= completedToday%></div>
           <div class="stat-detail">Successfully completed</div>
         </div>
       </div>
@@ -113,90 +134,68 @@
             <th>Appointment ID</th>
             <th>Patient Name</th>
             <th>Doctor</th>
-            <th>Department</th>
             <th>Date</th>
             <th>Time</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
+            
+    <% 
+    ResultSet rs = null;
+    PreparedStatement s = null;
+try{ 
+      
+        s = con.prepareStatement("SELECT a.appointment_id, p.full_name, d.docName, a.appointment_type, a.appointment_date, a.appointment_time, a.reason, a.status  FROM appointments a JOIN patients p ON a.patient_id = p.patient_id JOIN doctor d ON a.doctor_id = d.docId");
+       rs = s.executeQuery();
+       
+while(rs.next()){
+    %>
         <tbody>
           <tr>
-            <td>#APT001</td>
-            <td>John Doe</td>
-            <td>Dr. John Smith</td>
-            <td>Cardiology</td>
-            <td>2025-10-23</td>
-            <td>10:00 AM</td>
-            <td><span class="status-badge scheduled">Scheduled</span></td>
+            <td><%= rs.getInt("appointment_id")%></td>
+            <td><%= rs.getString("full_name")%></td>
+            <td><%= rs.getString("docName")%></td>
+            <td><%= rs.getDate("appointment_date")%></td>
+            <td><%= rs.getTime("appointment_time")%></td>
+            <td><span class="status-badge scheduled"><%= rs.getString("status")%></span></td>
             <td>
               <button class="btn-icon" onclick="viewAppointment(1)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editAppointment(1)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="cancelAppointment(1)" title="Cancel">❌</button>
+              <a class="btn-icon delete" href="${pageContext.request.contextPath}/CancelAppointment?cancel=<%= rs.getInt("appointment_id") %>" 
+   class="btn-icon delete" 
+   title="Cancel">❌</a>
+
             </td>
           </tr>
-          <tr>
-            <td>#APT002</td>
-            <td>Jane Smith</td>
-            <td>Dr. Sarah Williams</td>
-            <td>Neurology</td>
-            <td>2025-10-23</td>
-            <td>11:30 AM</td>
-            <td><span class="status-badge pending">Pending</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewAppointment(2)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editAppointment(2)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="cancelAppointment(2)" title="Cancel">❌</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#APT003</td>
-            <td>Robert Brown</td>
-            <td>Dr. Michael Brown</td>
-            <td>Orthopedics</td>
-            <td>2025-10-22</td>
-            <td>01:00 PM</td>
-            <td><span class="status-badge completed">Completed</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewAppointment(3)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editAppointment(3)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="cancelAppointment(3)" title="Cancel">❌</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#APT004</td>
-            <td>Emily Davis</td>
-            <td>Dr. Emily Davis</td>
-            <td>Pediatrics</td>
-            <td>2025-10-24</td>
-            <td>03:30 PM</td>
-            <td><span class="status-badge scheduled">Scheduled</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewAppointment(4)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editAppointment(4)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="cancelAppointment(4)" title="Cancel">❌</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#APT005</td>
-            <td>Michael Wilson</td>
-            <td>Dr. John Smith</td>
-            <td>Cardiology</td>
-            <td>2025-10-21</td>
-            <td>09:00 AM</td>
-            <td><span class="status-badge cancelled">Cancelled</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewAppointment(5)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editAppointment(5)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="cancelAppointment(5)" title="Cancel">❌</button>
-            </td>
-          </tr>
+          <%
+        }
+    } catch (Exception e) {
+      out.println("Error: " + e.getMessage());
+    } finally {
+        if (rs != null) rs.close();
+        if (s != null) s.close();
+        if (con != null) con.close();
+    }
+%>
         </tbody>
       </table>
     </div>
   </main>
 </div>
 
+          <%
+          Class.forName("com.mysql.cj.jdbc.Driver");
+    Connection con1 = null;
+    con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755");
+    Statement sp = con1.createStatement();
+    ResultSet rq = sp.executeQuery("SELECT docId, docName FROM doctor");
+%>
+          <%  String q = "SELECT patient_id, full_name FROM patients WHERE patient_type = ?";
+          String p = "outpatient";
+              PreparedStatement sm = con1.prepareStatement(q);
+              sm.setString(1, p);
+          ResultSet rm = sm.executeQuery();
+    %>
 <!-- Book/Edit Appointment Modal -->
 <div id="appointmentModal" class="modal">
   <div class="modal-content">
@@ -204,42 +203,36 @@
       <h2 id="modalTitle">Book New Appointment</h2>
       <span class="close" onclick="closeModal()">&times;</span>
     </div>
-    <form id="appointmentForm" class="appointment-form">
+      <form id="appointmentForm" class="appointment-form" action="${pageContext.request.contextPath}/AddAppointment" method="post">
       <div class="form-row">
         <div class="form-group">
           <label>Patient *</label>
           <select name="patient" required>
             <option value="">Select Patient</option>
-            <option value="p001">John Doe - #P001</option>
-            <option value="p002">Jane Smith - #P002</option>
-            <option value="p003">Robert Brown - #P003</option>
-            <option value="p004">Emily Davis - #P004</option>
-            <option value="p005">Michael Wilson - #P005</option>
+            <% while(rm.next()){
+               %>
+               <option value="<%=  rm.getInt("patient_id")%>">
+                    <%= rm.getString("full_name")%> - <%=  rm.getInt("patient_id")%>
+               </option>
+               <% } %>
           </select>
         </div>
-        <div class="form-group">
-          <label>Department *</label>
-          <select name="department" required onchange="filterDoctors(this.value)">
-            <option value="">Select Department</option>
-            <option value="cardiology">Cardiology</option>
-            <option value="neurology">Neurology</option>
-            <option value="orthopedics">Orthopedics</option>
-            <option value="pediatrics">Pediatrics</option>
-            <option value="general">General Medicine</option>
-            <option value="dermatology">Dermatology</option>
-          </select>
-        </div>
+
       </div>
-      
       <div class="form-row">
         <div class="form-group">
           <label>Doctor *</label>
           <select name="doctor" required id="doctorSelect">
             <option value="">Select Doctor</option>
-            <option value="d001" data-dept="cardiology">Dr. John Smith - Cardiologist</option>
-            <option value="d002" data-dept="neurology">Dr. Sarah Williams - Neurologist</option>
-            <option value="d003" data-dept="orthopedics">Dr. Michael Brown - Orthopedic</option>
-            <option value="d004" data-dept="pediatrics">Dr. Emily Davis - Pediatrician</option>
+             <%
+        while(rq.next()) {
+    %>
+        <option value="<%= rq.getString("docId") %>">
+            <%= rq.getString("docName") %>
+        </option>
+    <%
+        }
+    %>
           </select>
         </div>
         <div class="form-group">
