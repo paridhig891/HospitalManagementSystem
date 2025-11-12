@@ -1,8 +1,3 @@
-<%-- 
-    Document   : login
-    Created on : 18-Oct-2025, 11:10:14 pm
-    Author     : LENOVO
---%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
