@@ -1,10 +1,6 @@
-<%-- 
-    Document   : staff
-    Created on : 22-Oct-2025, 7:51:36 pm
-    Author     : LENOVO
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import = "java.sql.*, javax.sql.*"%>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,7 +21,7 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name">ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
@@ -41,6 +37,7 @@
       <a href="staff.jsp" class="nav-item active">Staff</a>
       <a href="bill.jsp" class="nav-item">Billing</a>
     </nav>
+    
     <div class="sidebar-footer">
       © 2025 MediCare HMS
     </div>
@@ -115,83 +112,40 @@
             <th>Name</th>
             <th>Role</th>
             <th>Phone</th>
-            <th>Email</th>
             <th>Department</th>
-            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td>#S001</td>
-            <td>Sarah Johnson</td>
-            <td>Nurse</td>
-            <td>+1 234-567-8900</td>
-            <td>sarah.j@medicare.com</td>
-            <td>Cardiology</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewStaff(1)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editStaff(1)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteStaff(1)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#S002</td>
-            <td>Michael Chen</td>
-            <td>Lab Technician</td>
-            <td>+1 234-567-8901</td>
-            <td>michael.c@medicare.com</td>
-            <td>Laboratory</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewStaff(2)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editStaff(2)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteStaff(2)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#S003</td>
-            <td>Emily Martinez</td>
-            <td>Receptionist</td>
-            <td>+1 234-567-8902</td>
-            <td>emily.m@medicare.com</td>
-            <td>Front Desk</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewStaff(3)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editStaff(3)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteStaff(3)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#S004</td>
-            <td>David Wilson</td>
-            <td>Pharmacist</td>
-            <td>+1 234-567-8903</td>
-            <td>david.w@medicare.com</td>
-            <td>Pharmacy</td>
-            <td><span class="status-badge active">Active</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewStaff(4)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editStaff(4)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteStaff(4)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#S005</td>
-            <td>Lisa Anderson</td>
-            <td>Nurse</td>
-            <td>+1 234-567-8904</td>
-            <td>lisa.a@medicare.com</td>
-            <td>Pediatrics</td>
-            <td><span class="status-badge inactive">On Leave</span></td>
-            <td>
-              <button class="btn-icon" onclick="viewStaff(5)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editStaff(5)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteStaff(5)" title="Delete">🗑️</button>
-            </td>
-          </tr>
+         <%
+      // Database connection setup
+      Class.forName("com.mysql.cj.jdbc.Driver");
+      Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755");
+String query = "SELECT s.staff_id, s.name, s.role, s.phone, d.depName FROM staff s LEFT JOIN department d ON s.department = d.depId";
+      PreparedStatement st = con.prepareStatement(query);
+      
+      ResultSet rs = st.executeQuery();
+
+      while (rs.next()) {
+    %>
+        <tr>
+          <td><%= rs.getInt("staff_id") %></td>
+          <td><%= rs.getString("name") %></td>
+          <td><%= rs.getString("role") %></td>
+          <td><%= rs.getString("phone") %></td>
+          <td><%= (rs.getString("depName") != null ? rs.getString("depName") : "—") %></td>
+          
+          <td>
+            <button class="btn-icon" onclick="viewStaff(<%= rs.getInt("staff_id") %>)" title="View">👁️</button>
+            <button class="btn-icon" onclick="editStaff(<%= rs.getInt("staff_id") %>)" title="Edit">✏️</button>
+            <button class="btn-icon delete" onclick="deleteStaff(<%= rs.getInt("staff_id") %>)" title="Delete">🗑️</button>
+          </td>
+        </tr>
+    <%
+      }
+      con.close();
+    %>
+         
         </tbody>
       </table>
     </div>
@@ -205,7 +159,8 @@
       <h2 id="modalTitle">Add New Staff</h2>
       <span class="close" onclick="closeModal()">&times;</span>
     </div>
-    <form id="staffForm" class="staff-form">
+      <form id="staffForm" class="staff-form" action="${pageContext.request.contextPath}/SaveStaff" method="post">
+      
       <div class="form-row">
         <div class="form-group">
           <label>Full Name *</label>
@@ -234,35 +189,44 @@
           <input type="tel" name="phone" required placeholder="+1 234-567-8900">
         </div>
         <div class="form-group">
-          <label>Email *</label>
-          <input type="email" name="email" required placeholder="staff@medicare.com">
+          <label>Gender *</label>
+          <select name="gender" required>
+            <option value="">Select Gender</option>
+            <option value="male">Male</option>
+            <option value="female">Female</option>
+            <option value="other">Other</option>
+          </select>
         </div>
       </div>
-      
+
       <div class="form-row">
+        <div class="form-group">
+          <label>Age *</label>
+          <input type="number" name="age" required min="18" max="70" placeholder="Enter age">
+        </div>
         <div class="form-group">
           <label>Department</label>
           <select name="department">
             <option value="">Select Department (Optional)</option>
-            <option value="cardiology">Cardiology</option>
-            <option value="neurology">Neurology</option>
-            <option value="orthopedics">Orthopedics</option>
-            <option value="pediatrics">Pediatrics</option>
-            <option value="general">General Medicine</option>
-            <option value="emergency">Emergency</option>
-            <option value="laboratory">Laboratory</option>
-            <option value="pharmacy">Pharmacy</option>
-            <option value="radiology">Radiology</option>
-            <option value="administration">Administration</option>
+            <option value="DE101">Cardiology</option>
+            <option value="DE102">Neurology</option>
+            <option value="DE103">Orthopedics</option>
+            <option value="DE104">Pediatrics</option>
+            <option value="">General Medicine</option>
+            <option value="107">Emergency</option>
+            <option value="">Laboratory</option>
+            <option value="">Pharmacy</option>
+            <option value="DE105">Radiology</option>
+            <option value="DE106">Administration</option>
           </select>
-        </div>
-        <div class="form-group">
-          <label>Date of Joining *</label>
-          <input type="date" name="joiningDate" required>
         </div>
       </div>
       
       <div class="form-row">
+        <div class="form-group">
+          <label>Date of Joining *</label>
+          <input type="date" name="joiningDate" required>
+        </div>
         <div class="form-group">
           <label>Shift Timing *</label>
           <select name="shift" required>
@@ -273,13 +237,13 @@
             <option value="rotational">Rotational</option>
           </select>
         </div>
+      </div>
+
+      <div class="form-row">
         <div class="form-group">
           <label>Salary (Monthly) *</label>
           <input type="number" name="salary" required placeholder="5000">
         </div>
-      </div>
-      
-      <div class="form-row">
         <div class="form-group full-width">
           <label>Address</label>
           <textarea name="address" rows="3" placeholder="Enter full address"></textarea>
@@ -293,6 +257,7 @@
     </form>
   </div>
 </div>
+
 
 <!-- Staff Profile Modal -->
 <div id="profileModal" class="modal">
