@@ -1,7 +1,4 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
+
 // Open Generate Bill Modal
 function openGenerateBillModal() {
   document.getElementById('billModal').style.display = 'flex';
@@ -127,10 +124,10 @@ window.onclick = function(event) {
 }
 
 // Handle form submission
-document.getElementById('billForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Bill generated successfully!');
-  closeModal();
-});
+// document.getElementById('billForm').addEventListener('submit', function(e) {
+ // e.preventDefault();
+ // alert('Bill generated successfully!');
+ // closeModal();
+// });
 
 
