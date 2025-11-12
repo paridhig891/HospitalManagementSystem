@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
 // Open Add Staff Modal
 function openAddStaffModal() {
   document.getElementById('modalTitle').textContent = 'Add New Staff';
@@ -24,12 +20,7 @@ function closeProfileModal() {
   document.getElementById('profileModal').style.display = 'none';
 }
 
-// Edit Staff
-function editStaff(id) {
-  document.getElementById('modalTitle').textContent = 'Edit Staff';
-  document.getElementById('staffModal').style.display = 'flex';
-  // Here you would populate the form with staff data
-}
+
 
 // Delete Staff
 function deleteStaff(id) {
@@ -69,11 +60,11 @@ window.onclick = function(event) {
 }
 
 // Handle form submission
-document.getElementById('staffForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Staff saved successfully!');
-  closeModal();
+// document.getElementById('staffForm').addEventListener('submit', function(e) {
+ // e.preventDefault();
+ // alert('Staff saved successfully!');
+ // closeModal();
   // Here you would save the staff data to database
-});
+// });
 
 
