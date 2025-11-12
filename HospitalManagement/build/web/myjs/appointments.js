@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
 
 // Open Book Appointment Modal
 function openBookAppointmentModal() {
@@ -32,13 +28,6 @@ function editAppointment(id) {
   // Populate form with appointment data
 }
 
-// Cancel Appointment
-function cancelAppointment(id) {
-  if(confirm('Are you sure you want to cancel this appointment?')) {
-    alert('Appointment cancelled successfully!');
-    // Update appointment status to cancelled
-  }
-}
 
 // Search Appointments
 function searchAppointments() {
@@ -108,10 +97,23 @@ window.onclick = function(event) {
 }
 
 // Handle form submission
-document.getElementById('appointmentForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Appointment booked successfully!');
-  closeModal();
+// document.getElementById('appointmentForm').addEventListener('submit', function(e) {
+ // alert('Appointment booked successfully!');
+ // closeModal();
   // Save appointment to database
-});
+// });
 
+
+// ✅ Automatically update appointment statuses every 1 minute
+function autoUpdateAppointments() {
+  fetch("../CompleteAppointment")
+    .then(response => response.text())
+    .then(data => console.log("Auto update response:", data))
+    .catch(err => console.error("Error auto updating appointments:", err));
+}
+
+// Call immediately on page load
+autoUpdateAppointments();
+
+// Then run every 60 seconds (1 minute)
+setInterval(autoUpdateAppointments, 60000);
