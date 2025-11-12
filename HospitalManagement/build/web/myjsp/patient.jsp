@@ -1,9 +1,4 @@
-<%-- 
-    Document   : patient
-    Created on : 22-Oct-2025, 7:47:22 pm
-    Author     : LENOVO
---%>
-
+<%@ page import="java.sql.*, javax.sql.*" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,13 +20,13 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name">ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
     </div>
     
- <nav class="nav-menu">
+    <nav class="nav-menu">
       <a href="dashboard.jsp" class="nav-item">Dashboard</a>
       <a href="patient.jsp" class="nav-item active">Patients</a>
       <a href="doctor.jsp" class="nav-item">Doctors</a>
@@ -41,7 +36,6 @@
       <a href="staff.jsp" class="nav-item">Staff</a>
       <a href="bill.jsp" class="nav-item">Billing</a>
     </nav>
-
     
     <div class="sidebar-footer">
       © 2025 MediCare HMS
@@ -93,164 +87,278 @@
             <th>Gender</th>
             <th>Phone</th>
             <th>Blood Group</th>
-            <th>Department</th>
-            <th>Room</th>
             <th>Admission Date</th>
+            <th>Status<th>
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td>#P001</td>
-            <td>John Doe</td>
-            <td>45</td>
-            <td>Male</td>
-            <td>+1 234-567-8900</td>
-            <td>O+</td>
-            <td>Cardiology</td>
-            <td>101</td>
-            <td>2025-10-15</td>
-            <td>
-              <button class="btn-icon" onclick="viewPatient(1)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editPatient(1)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deletePatient(1)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#P002</td>
-            <td>Jane Smith</td>
-            <td>32</td>
-            <td>Female</td>
-            <td>+1 234-567-8901</td>
-            <td>A+</td>
-            <td>Neurology</td>
-            <td>205</td>
-            <td>2025-10-18</td>
-            <td>
-              <button class="btn-icon" onclick="viewPatient(2)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editPatient(2)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deletePatient(2)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#P003</td>
-            <td>Robert Brown</td>
-            <td>28</td>
-            <td>Male</td>
-            <td>+1 234-567-8902</td>
-            <td>B+</td>
-            <td>Orthopedics</td>
-            <td>310</td>
-            <td>2025-10-20</td>
-            <td>
-              <button class="btn-icon" onclick="viewPatient(3)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editPatient(3)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deletePatient(3)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-        </tbody>
+       <tbody>
+<%
+    Connection con = null;
+    Statement st = null;
+    ResultSet rs = null;
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755");
+        st = con.createStatement();
+
+        // Fetch patients data (join with department if needed)
+        String query =  "SELECT p.patient_id, p.full_name, p.age, p.gender, p.contact, p.blood_group, " +
+            " p.status, p.created_at " +
+            "FROM patients p " +
+            "ORDER BY p.created_at DESC";
+        rs = st.executeQuery(query);
+
+        while (rs.next()) {
+%>
+  <tr>
+    <td><%= rs.getString("patient_id") %></td>
+    <td><%= rs.getString("full_name") %></td>
+    <td><%= rs.getInt("age") %></td>
+    <td><%= rs.getString("gender") %></td>
+    <td><%= rs.getString("contact") %></td>
+    <td><%= rs.getString("blood_group") %></td>
+    <td><%= rs.getTimestamp("created_at") %></td>
+    <td><%= rs.getString("status") != null ? rs.getString("status") : "-" %></td>
+    <td>
+      <button class="btn-icon" title="View">👁️</button>
+      <button class="btn-icon" title="Edit">✏️</button>
+
+      <a href="<%= request.getContextPath() %>/DeletePatient?patient_id=<%= rs.getInt("patient_id")%>" 
+   onclick="return confirm('Are you sure you want to delete this patient?');" 
+   class="btn-icon delete" 
+   title="Delete">🗑️</a>
+    </td>
+  </tr>
+<%
+        }
+    } catch (Exception e) {
+        out.println("<tr><td colspan='10'>Error loading patients: " + e.getMessage() + "</td></tr>");
+    } finally {
+        if (rs != null) rs.close();
+        if (st != null) st.close();
+        if (con != null) con.close();
+    }
+%>
+</tbody>
+
       </table>
     </div>
   </main>
 </div>
 
-<!-- Add/Edit Patient Modal -->
-<div id="patientModal" class="modal">
+<!-- Patient Type Selection Modal -->
+<div id="patientTypeModal" class="modal">
+  <div class="modal-content type-modal">
+    <h2>Select Patient Type</h2>
+    <div class="type-options">
+      <button class="btn-primary" onclick="selectPatientType('outpatient')">Outpatient</button>
+      <button class="btn-primary" onclick="selectPatientType('inpatient')">Inpatient</button>
+    </div>
+    <button class="close-btn" onclick="closeTypeModal()">Cancel</button>
+  </div>
+</div>
+
+<%
+    Connection con1 = null;
+    con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755");
+    Statement sp = con1.createStatement();
+    ResultSet rq = sp.executeQuery("SELECT docId, docName FROM doctor");
+%>
+
+<!-- Outpatient Modal -->
+<div id="outpatientModal" class="modal">
   <div class="modal-content">
     <div class="modal-header">
-      <h2 id="modalTitle">Add New Patient</h2>
-      <span class="close" onclick="closeModal()">&times;</span>
+      <h2>Add Outpatient</h2>
+      <span class="close" onclick="closeModal('outpatientModal')">&times;</span>
     </div>
-    <form id="patientForm" class="patient-form">
-      <div class="form-row">
-        <div class="form-group">
-          <label>Full Name *</label>
-          <input type="text" name="name" required placeholder="Enter patient name">
-        </div>
-        <div class="form-group">
-          <label>Age *</label>
-          <input type="number" name="age" required placeholder="Age">
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Gender *</label>
-          <select name="gender" required>
-            <option value="">Select Gender</option>
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Phone Number *</label>
-          <input type="tel" name="phone" required placeholder="+1 234-567-8900">
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Blood Group *</label>
-          <select name="bloodGroup" required>
-            <option value="">Select Blood Group</option>
-            <option value="A+">A+</option>
-            <option value="A-">A-</option>
-            <option value="B+">B+</option>
-            <option value="B-">B-</option>
-            <option value="O+">O+</option>
-            <option value="O-">O-</option>
-            <option value="AB+">AB+</option>
-            <option value="AB-">AB-</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Department *</label>
-          <select name="department" required>
-            <option value="">Select Department</option>
-            <option value="cardiology">Cardiology</option>
-            <option value="neurology">Neurology</option>
-            <option value="orthopedics">Orthopedics</option>
-            <option value="pediatrics">Pediatrics</option>
-            <option value="general">General Medicine</option>
-          </select>
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Assigned Doctor *</label>
-          <select name="doctor" required>
-            <option value="">Select Doctor</option>
-            <option value="dr-smith">Dr. John Smith</option>
-            <option value="dr-williams">Dr. Sarah Williams</option>
-            <option value="dr-brown">Dr. Michael Brown</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Assigned Room *</label>
-          <input type="text" name="room" required placeholder="Room Number">
-        </div>
-      </div>
-      
-      <div class="form-row">
-        <div class="form-group">
-          <label>Admission Date *</label>
-          <input type="date" name="admissionDate" required>
-        </div>
-        <div class="form-group">
-          <label>Discharge Date</label>
-          <input type="date" name="dischargeDate">
-        </div>
-      </div>
-      
+    <form id="outpatientForm" method="post" action="${pageContext.request.contextPath}/AddPatient">
+      <!-- All the fields from your previous form -->
+      <input type="hidden" name="patient_type" value="Outpatient">
+     <div class="form-row">
+    <div class="form-group">
+      <label>Patient Name</label>
+      <input type="text" name="name" required>
+    </div>
+    <div class="form-group">
+      <label>Age</label>
+      <input type="number" name="age" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Gender</label>
+      <select name="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="text" name="phone" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Blood Group</label>
+      <select name="blood_group">
+        <option value="">Select</option>
+        <option>A+</option>
+        <option>A-</option>
+        <option>B+</option>
+        <option>B-</option>
+        <option>O+</option>
+        <option>O-</option>
+        <option>AB+</option>
+        <option>AB-</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" name="address">
+    </div>
+  </div>
+      <!-- Remove admission/discharge/room/doctor fields -->
+      <input type="hidden" name="patient_type" value="outpatient">
+      <!-- same form fields here -->
       <div class="form-actions">
-        <button type="button" class="btn-secondary" onclick="closeModal()">Cancel</button>
-        <button type="submit" class="btn-primary">Save Patient</button>
+        <button type="button" class="btn-secondary" onclick="closeModal('outpatientModal')">Cancel</button>
+        <button type="submit" class="btn-primary">Save Outpatient</button>
       </div>
     </form>
   </div>
 </div>
+
+<!-- Inpatient Modal (Step 1: Common details) -->
+<div id="inpatientModalStep1" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Add Inpatient - Basic Details</h2>
+      <span class="close" onclick="closeModal('inpatientModalStep1')">&times;</span>
+    </div>
+      <form id="inpatientFormStep1" method="post" action="${pageContext.request.contextPath}/AddInpatient">
+      <!-- Same patient form fields (without admission/room/doctor) -->
+      <input type="hidden" name="patient_type" value="inpatient">
+           <div class="form-row">
+    <div class="form-group">
+      <label>Patient Name</label>
+      <input type="text" name="name" required>
+    </div>
+    <div class="form-group">
+      <label>Age</label>
+      <input type="number" name="age" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Gender</label>
+      <select name="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Phone</label>
+      <input type="text" name="phone" required>
+    </div>
+  </div>
+
+  <div class="form-row">
+    <div class="form-group">
+      <label>Blood Group</label>
+      <select name="blood_group">
+        <option value="">Select</option>
+        <option>A+</option>
+        <option>A-</option>
+        <option>B+</option>
+        <option>B-</option>
+        <option>O+</option>
+        <option>O-</option>
+        <option>AB+</option>
+        <option>AB-</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>Address</label>
+      <input type="text" name="address">
+    </div>
+  </div>
+      <input type="hidden" name="patient_type" value="inpatient">
+      <input type="hidden" name="patient_id" id="patient_id_hidden">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select name="department">
+            <option value="">Select Department</option>
+            <option value="DE101">Cardiology</option>
+            <option value="DE102">Neurology</option>
+            <option value="DE103">Orthopedics</option>
+            <option value="DE104">Pediatrics</option>
+          </select>
+        </div>
+      <div class="form-group">
+  <label>Assigned Doctor</label>
+  <select name="docId" required>
+    <option value="">-- Select Doctor --</option>
+    <%
+        while(rq.next()) {
+    %>
+        <option value="<%= rq.getString("docId") %>">
+            <%= rq.getString("docName") %>
+        </option>
+    <%
+        }
+    %>
+  </select>
+</div>
+
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Room Number</label>
+          <input type="text" name="room">
+        </div>
+        <div class="form-group">
+          <label>Admission Date</label>
+          <input type="date" name="admission_date">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Discharge Date</label>
+          <input type="date" name="discharge_date">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn-secondary" onclick="closeModal('inpatientModalStep2')">Cancel</button>
+        <button type="submit" class="btn-primary">Save Inpatient</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+      
+<!-- Inpatient Modal (Step 2: Extra details) -->
+<div id="inpatientModalStep2" class="modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Inpatient - Additional Details</h2>
+      <span class="close" onclick="closeModal('inpatientModalStep2')">&times;</span>
+    </div>
+    <form id="inpatientFormStep2" method="post" action="${pageContext.request.contextPath}/AddInpatient">
+      
+    </form>
+  </div>
+</div>
+
 
 <!-- Patient Profile Modal -->
 <div id="profileModal" class="modal">
@@ -324,6 +432,6 @@
   </div>
 </div>
 
-<script src="patients.js"></script>
+<script src="../myjs/patient.js"></script>
 </body>
 </html>
