@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
+
 package myservlets;
 
 import java.sql.Connection;
@@ -18,22 +15,9 @@ import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author LENOVO
- */
 public class AddDoctor extends HttpServlet {
-    static int count;
+    public static int count;
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
    public void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
        System.out.println("AddDoctor servlet triggered!");
