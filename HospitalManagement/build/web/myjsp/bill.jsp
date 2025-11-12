@@ -1,10 +1,5 @@
-<%-- 
-    Document   : bill
-    Created on : 22-Oct-2025, 7:52:06 pm
-    Author     : LENOVO
---%>
-
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import =  "java.sql.*"%>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -25,13 +20,13 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name">ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
     </div>
     
-     <nav class="nav-menu">
+    <nav class="nav-menu">
       <a href="dashboard.jsp" class="nav-item">Dashboard</a>
       <a href="patient.jsp" class="nav-item">Patients</a>
       <a href="doctor.jsp" class="nav-item">Doctors</a>
@@ -174,6 +169,15 @@
   </main>
 </div>
 
+     <%
+          Class.forName("com.mysql.cj.jdbc.Driver");
+    Connection con1 = null;
+    con1 = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755");
+%>
+          <%  String q = "SELECT patient_id, full_name FROM patients";
+              PreparedStatement sm = con1.prepareStatement(q);
+          ResultSet rm = sm.executeQuery();
+    %>
 <!-- Generate Bill Modal -->
 <div id="billModal" class="modal">
   <div class="modal-content large-modal">
@@ -181,16 +185,18 @@
       <h2>Generate New Bill</h2>
       <span class="close" onclick="closeModal()">&times;</span>
     </div>
-    <form id="billForm" class="bill-form">
+      <form id="billForm" class="bill-form" action="${pageContext.request.contextPath}/GenerateBillServlet" method="post">
       <div class="form-row">
         <div class="form-group">
           <label>Patient *</label>
           <select name="patient" required>
             <option value="">Select Patient</option>
-            <option value="p001">John Doe - #P001</option>
-            <option value="p002">Jane Smith - #P002</option>
-            <option value="p003">Robert Brown - #P003</option>
-            <option value="p004">Emily Davis - #P004</option>
+            <% while(rm.next()){
+               %>
+               <option value="<%=  rm.getInt("patient_id")%>">
+                    <%= rm.getString("full_name")%> - <%=  rm.getInt("patient_id")%>
+               </option>
+               <% } %>
           </select>
         </div>
         <div class="form-group">
@@ -198,7 +204,16 @@
           <input type="date" name="billDate" required>
         </div>
       </div>
-      
+      <div class="form-group">
+  <label>Payment Mode *</label>
+  <select name="payMode" required>
+    <option value="">Select</option>
+    <option value="Cash">Cash</option>
+    <option value="Card">Card</option>
+    <option value="UPI">UPI</option>
+  </select>
+</div>
+
       <div class="services-section">
         <div class="section-header">
           <h3>Services / Items</h3>
