@@ -1,17 +1,14 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
-// Open Add Patient Modal
-function openAddPatientModal() {
-  document.getElementById('modalTitle').textContent = 'Add New Patient';
-  document.getElementById('patientModal').style.display = 'flex';
-}
 
 // Close Patient Form Modal
-function closeModal() {
-  document.getElementById('patientModal').style.display = 'none';
-  document.getElementById('patientForm').reset();
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = "none"; // hide modal
+    modal.classList.remove("show"); // remove Bootstrap 'show' class
+    document.body.classList.remove("modal-open"); // restore scroll
+    const backdrop = document.querySelector(".modal-backdrop");
+    if (backdrop) backdrop.remove(); // remove overlay
+  }
 }
 
 // Open Patient Profile Modal
@@ -66,6 +63,58 @@ window.onclick = function(event) {
   if (event.target == profileModal) {
     closeProfileModal();
   }
+}
+
+document.querySelector('select[name="patient_type"]').addEventListener('change', function() {
+  const inpatientFields = document.querySelectorAll('.inpatient-fields');
+  inpatientFields.forEach(f => {
+    f.style.display = (this.value === 'inpatient') ? 'flex' : 'none';
+  });
+});
+
+
+
+function closeTypeModal() {
+  document.getElementById('patientTypeModal').style.display = 'none';
+}
+
+
+
+// Open Add Patient Modal — show type selection first
+function openAddPatientModal() {
+  // Safely hide other modals if they exist
+  const outpatientModal = document.getElementById('outpatientModal');
+  const inpatientModalStep1 = document.getElementById('inpatientModalStep1');
+  const inpatientModalStep2 = document.getElementById('inpatientModalStep2');
+  const typeModal = document.getElementById('patientTypeModal');
+
+  if (outpatientModal) outpatientModal.style.display = 'none';
+  if (inpatientModalStep1) inpatientModalStep1.style.display = 'none';
+  if (inpatientModalStep2) inpatientModalStep2.style.display = 'none';
+
+  // Show type selection card
+  if (typeModal) typeModal.style.display = 'flex';
+}
+
+
+// When user selects patient type
+function selectPatientType(type) {
+  // Close the type selection card
+  document.getElementById('patientTypeModal').style.display = 'none';
+
+  // Show the appropriate modal based on type
+  if (type === 'outpatient') {
+    document.getElementById('outpatientModal').style.display = 'flex';
+  } 
+  else if (type === 'inpatient') {
+    document.getElementById('inpatientModalStep1').style.display = 'flex';
+  }
+}
+
+function goToInpatientStep2() {
+  // You can validate step 1 fields before proceeding if needed
+  document.getElementById('inpatientModalStep1').style.display = 'none';
+  document.getElementById('inpatientModalStep2').style.display = 'flex';
 }
 
 
