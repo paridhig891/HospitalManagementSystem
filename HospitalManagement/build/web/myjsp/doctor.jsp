@@ -1,10 +1,7 @@
-<%-- 
-    Document   : doctor
-    Created on : 22-Oct-2025, 7:48:04 pm
-    Author     : LENOVO
---%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ page import="java.sql.*, javax.sql.*" %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,6 +13,26 @@
 </head>
 <body>
 
+    <% String msg = request.getParameter("msg"); %>
+<div id="msgDiv" style="display: <%= (msg != null) ? "block" : "none" %>; color: green; font-weight: bold; margin: 10px 0;">
+    <% if("deleted".equals(msg)) { %>
+        Doctor deleted successfully!
+    <% } else if("error".equals(msg)) { %>
+        Error deleting doctor!
+    <% } else if("notfound".equals(msg)) { %>
+        Doctor not found!
+    <% } %>
+</div>
+
+<script>
+  // Auto-hide after 4 seconds
+  setTimeout(() => {
+      const msgDiv = document.getElementById('msgDiv');
+      if(msgDiv) msgDiv.style.display = 'none';
+  }, 4000);
+</script>
+
+    
 <div class="dashboard">
   <!-- Sidebar -->
   <aside class="sidebar">
@@ -25,13 +42,13 @@
           <polyline points="2,13 9,13 13,23 21,1 23,13 31,13" stroke="#fff" stroke-width="2" fill="none" />
         </svg>
         <div>
-          <div class="brand-name">MediCare</div>
+          <div class="brand-name">ADMIN</div>
           <div class="brand-tagline">Hospital Management</div>
         </div>
       </div>
     </div>
     
-  <nav class="nav-menu">
+    <nav class="nav-menu">
       <a href="dashboard.jsp" class="nav-item">Dashboard</a>
       <a href="patient.jsp" class="nav-item">Patients</a>
       <a href="doctor.jsp" class="nav-item active">Doctors</a>
@@ -93,64 +110,52 @@
             <th>Actions</th>
           </tr>
         </thead>
-        <tbody>
+       <tbody>
+<%
+    Connection con = null;
+    PreparedStatement ps = null;
+    ResultSet rs = null;
+    try {
+        Class.forName("com.mysql.cj.jdbc.Driver");
+        con = DriverManager.getConnection("jdbc:mysql://localhost:3306/hospital_management", "root", "6755"); // change credentials
+
+        String query = "SELECT d.docId, d.docName, d.specialization, d.docContact, dept.depName, d.docSalary, d.docExperience " +
+                       "FROM doctor d JOIN department dept ON d.depId = dept.depId";
+        ps = con.prepareStatement(query);
+        rs = ps.executeQuery();
+
+        while (rs.next()) {
+%>
           <tr>
-            <td>#D001</td>
-            <td>Dr. John Smith</td>
-            <td>Cardiologist</td>
-            <td>+1 234-567-8900</td>
-            <td>Cardiology</td>
-            <td>$12,000/month</td>
-            <td>15 years</td>
+            <td><%= rs.getString("docId") %></td>
+            <td><%= rs.getString("docName") %></td>
+            <td><%= rs.getString("specialization") %></td>
+            <td><%= rs.getString("docContact") %></td>
+            <td><%= rs.getString("depName") %></td>
+            <td><%= rs.getInt("docSalary") %></td>
+            <td><%= rs.getInt("docExperience") %></td>
             <td>
-              <button class="btn-icon" onclick="viewDoctor(1)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editDoctor(1)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteDoctor(1)" title="Delete">🗑️</button>
+              <button class="btn-icon" title="View">👁️</button>
+              <button class="btn-icon" title="Edit">✏️</button>
+              <a href="<%= request.getContextPath() %>/DeleteDoctor?docId=<%= rs.getString("docId").trim() %>" 
+   onclick="return confirm('Are you sure you want to delete this doctor?');" 
+   class="btn-icon delete" 
+   title="Delete">🗑️</a>
+
             </td>
           </tr>
-          <tr>
-            <td>#D002</td>
-            <td>Dr. Sarah Williams</td>
-            <td>Neurologist</td>
-            <td>+1 234-567-8901</td>
-            <td>Neurology</td>
-            <td>$11,500/month</td>
-            <td>12 years</td>
-            <td>
-              <button class="btn-icon" onclick="viewDoctor(2)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editDoctor(2)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteDoctor(2)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#D003</td>
-            <td>Dr. Michael Brown</td>
-            <td>Orthopedic Surgeon</td>
-            <td>+1 234-567-8902</td>
-            <td>Orthopedics</td>
-            <td>$13,000/month</td>
-            <td>18 years</td>
-            <td>
-              <button class="btn-icon" onclick="viewDoctor(3)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editDoctor(3)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteDoctor(3)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-          <tr>
-            <td>#D004</td>
-            <td>Dr. Emily Davis</td>
-            <td>Pediatrician</td>
-            <td>+1 234-567-8903</td>
-            <td>Pediatrics</td>
-            <td>$10,500/month</td>
-            <td>10 years</td>
-            <td>
-              <button class="btn-icon" onclick="viewDoctor(4)" title="View">👁️</button>
-              <button class="btn-icon" onclick="editDoctor(4)" title="Edit">✏️</button>
-              <button class="btn-icon delete" onclick="deleteDoctor(4)" title="Delete">🗑️</button>
-            </td>
-          </tr>
-        </tbody>
+<%
+        }
+    } catch (Exception e) {
+      out.println("Error: " + e.getMessage());
+    } finally {
+        if (rs != null) rs.close();
+        if (ps != null) ps.close();
+        if (con != null) con.close();
+    }
+%>
+</tbody>
+
       </table>
     </div>
   </main>
@@ -163,7 +168,7 @@
       <h2 id="modalTitle">Add New Doctor</h2>
       <span class="close" onclick="closeModal()">&times;</span>
     </div>
-    <form id="doctorForm" class="doctor-form">
+      <form id="doctorForm" class="doctor-form" action="${pageContext.request.contextPath}/AddDoctor" method="post">
       <div class="form-row">
         <div class="form-group">
           <label>Full Name *</label>
@@ -200,13 +205,13 @@
           <label>Department *</label>
           <select name="department" required>
             <option value="">Select Department</option>
-            <option value="cardiology">Cardiology</option>
-            <option value="neurology">Neurology</option>
-            <option value="orthopedics">Orthopedics</option>
-            <option value="pediatrics">Pediatrics</option>
-            <option value="general">General Medicine</option>
-            <option value="dermatology">Dermatology</option>
-            <option value="ent">ENT</option>
+            <option value="DE101">Cardiology</option>
+            <option value="DE102">Neurology</option>
+            <option value="DE103">Orthopedics</option>
+            <option value="DE104">Pediatrics</option>
+            <option value="DE105">Gynecology</option>
+            <option value="DE106">Dermatology</option>
+            <option value="DE107">Emergency</option>
           </select>
         </div>
         <div class="form-group">
