@@ -1,7 +1,3 @@
-/* 
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/JavaScript.js to edit this template
- */
 
 // Open Add Doctor Modal
 function openAddDoctorModal() {
@@ -32,13 +28,7 @@ function editDoctor(id) {
   // Here you would populate the form with doctor data
 }
 
-// Delete Doctor
-function deleteDoctor(id) {
-  if(confirm('Are you sure you want to delete this doctor?')) {
-    alert('Doctor deleted successfully!');
-    // Here you would delete the doctor from database
-  }
-}
+
 
 // Search Doctors
 function searchDoctors() {
@@ -68,12 +58,28 @@ window.onclick = function(event) {
     closeProfileModal();
   }
 }
+// Auto-hide success message after 4 seconds
+setTimeout(() => {
+    const msgDiv = document.querySelector('div[style*="color: green"]');
+    if (msgDiv) msgDiv.style.display = 'none';
+}, 4000);
+
+//    function deleteDoctor(docId) {
+//    if (confirm("Are you sure you want to delete this doctor?")) {
+//      const contextPath = "<%= request.getContextPath() %>";
+//      // Encode the doctor ID properly to avoid invalid URI characters
+//      const encodedId = encodeURIComponent(docId.trim());
+//      window.location.href = contextPath + "/DeleteDoctor?docId=" + encodedId;
+//  }
+// }
+
+
 
 // Handle form submission
-document.getElementById('doctorForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  alert('Doctor saved successfully!');
-  closeModal();
+// document.getElementById('doctorForm').addEventListener('submit', function(e) {
+//  e.preventDefault();
+//  alert('Doctor saved successfully!');
+//  closeModal();
   // Here you would save the doctor data to database
-});
+// });
 
